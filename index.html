@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Mercado: Las 15 Pilas AAA Más Vendidas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf9f6;
+            color: #2b2a29;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f0eee9; }
+        ::-webkit-scrollbar-thumb { background: #d4cfc5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b8b1a5; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 280px; }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .hidden { display: none !important; }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0eee9 25%, #e0ddd5 50%, #f0eee9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals & Copper -->
+    <!-- Application Structure Plan: Update to include an AI Assistant tab. The user can now interact with the data through a natural language interface powered by Gemini. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-stone-800 tracking-tight">🔋 Reporte Global AAA</h1>
+                    <p class="text-sm text-stone-500 mt-1">Análisis de las 15 pilas más vendidas con Asistencia de IA.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 bg-stone-100 p-1 rounded-lg">
+                    <button id="tab-dashboard" class="px-4 py-2 text-sm rounded-md transition-colors tab-btn bg-white shadow-sm text-amber-700 font-semibold" onclick="switchTab('dashboard')">📊 Panorama</button>
+                    <button id="tab-catalog" class="px-4 py-2 text-sm rounded-md transition-colors tab-btn text-stone-600 hover:text-stone-900" onclick="switchTab('catalog')">🗂️ Catálogo</button>
+                    <button id="tab-guide" class="px-4 py-2 text-sm rounded-md transition-colors tab-btn text-stone-600 hover:text-stone-900" onclick="switchTab('guide')">💡 Guía de Uso</button>
+                    <button id="tab-ai" class="px-4 py-2 text-sm rounded-md transition-colors tab-btn text-stone-600 hover:text-stone-900" onclick="switchTab('ai')">✨ Consultor IA</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- TAB: DASHBOARD -->
+        <section id="view-dashboard" class="view-section transition-opacity duration-300">
+            <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-stone-800 mb-2">Panorama del Mercado AAA</h2>
+                <p class="text-stone-600">Métricas clave de rendimiento y distribución del Top 15 mundial.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 text-center md:text-left">
+                <div class="bg-white p-5 rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-sm text-stone-500">Capacidad Media</div>
+                    <div class="text-2xl font-bold text-stone-800">~1150 mAh</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-sm text-stone-500">Máxima Duración</div>
+                    <div class="text-2xl font-bold text-stone-800">20 Años</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-sm text-stone-500">Consumo en Arg.</div>
+                    <div class="text-2xl font-bold text-amber-600">Alcalina</div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-sm text-stone-500">Tendencia</div>
+                    <div class="text-2xl font-bold text-blue-600">Recargables</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-stone-100 shadow-sm">
+                    <h3 class="font-semibold mb-4">Químicas más Vendidas</h3>
+                    <div class="chart-container"><canvas id="chemistryChart"></canvas></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-100 shadow-sm">
+                    <h3 class="font-semibold mb-4">Capacidad vs Tecnología</h3>
+                    <div class="chart-container"><canvas id="capacityChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: CATALOG -->
+        <section id="view-catalog" class="view-section hidden transition-opacity duration-300">
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <h2 class="text-2xl font-semibold text-stone-800">Base de Datos de Pilas</h2>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button class="filter-btn active px-3 py-1 bg-stone-800 text-white rounded-full text-xs" data-filter="all">Todas</button>
+                    <button class="filter-btn px-3 py-1 bg-stone-200 text-stone-700 rounded-full text-xs" data-filter="Alcalina">Alcalinas</button>
+                    <button class="filter-btn px-3 py-1 bg-stone-200 text-stone-700 rounded-full text-xs" data-filter="NiMH">Recargables</button>
+                    <button class="filter-btn px-3 py-1 bg-stone-200 text-stone-700 rounded-full text-xs" data-filter="Litio">Litio</button>
+                </div>
+            </div>
+            <div id="battery-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- TAB: GUIDE -->
+        <section id="view-guide" class="view-section hidden transition-opacity duration-300">
+            <h2 class="text-2xl font-semibold text-stone-800 mb-6">Guía Estratégica de Uso</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 bg-white rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-3xl mb-2">🎮</div>
+                    <h3 class="font-bold mb-2">Alto Consumo</h3>
+                    <p class="text-sm text-stone-600">Dispositivos que drenan energía rápido (cámaras, joysticks). Usa <strong>NiMH</strong> o <strong>Litio</strong>.</p>
+                </div>
+                <div class="p-6 bg-white rounded-xl border border-stone-100 shadow-sm">
+                    <div class="text-3xl mb-2">📺</div>
+                    <h3 class="font-bold mb-2">Bajo Consumo</h3>
+                    <p class="text-sm text-stone-600">Equipos que duran meses con la misma pila (controles, relojes). Usa <strong>Alcalinas</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: AI ASSISTANT -->
+        <section id="view-ai" class="view-section hidden transition-opacity duration-300">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-amber-50 border border-amber-100 p-6 rounded-2xl mb-8">
+                    <h2 class="text-2xl font-bold text-stone-800 mb-2">✨ Consultor de Energía Inteligente</h2>
+                    <p class="text-stone-600 mb-6">Describe para qué dispositivo necesitas pilas y nuestra IA analizará las 15 mejores opciones del mercado para recomendarte la ideal.</p>
+                    
+                    <div class="flex flex-col gap-4">
+                        <textarea id="ai-input" placeholder="Ejemplo: Necesito pilas para una cámara de fotos profesional que uso mucho..." class="w-full p-4 rounded-xl border border-stone-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none h-32 resize-none"></textarea>
+                        <button id="ai-submit" onclick="askGemini()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                            <span>✨ Obtener Recomendación</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Response Area -->
+                <div id="ai-response-container" class="hidden">
+                    <div id="ai-loading" class="hidden space-y-4">
+                        <div class="h-6 w-1/3 loading-shimmer rounded"></div>
+                        <div class="h-24 w-full loading-shimmer rounded"></div>
+                    </div>
+                    <div id="ai-result" class="bg-white p-8 rounded-2xl border border-stone-200 shadow-lg prose max-w-none text-stone-800">
+                        <!-- Content will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center text-sm">
+        <p>Reporte Energético AAA © 2025 - Potenciado por Gemini AI</p>
+    </footer>
+
+    <script>
+        const batteryData = [
+            { id: 1, brand: "Duracell", model: "Coppertop", chem: "Alcalina", volt: 1.5, mah: 1150, price: "$$", desc: "Estándar confiable en Argentina." },
+            { id: 2, brand: "Energizer", model: "Max", chem: "Alcalina", volt: 1.5, mah: 1150, price: "$$", desc: "Garantía anti-derrames." },
+            { id: 3, brand: "Energizer", model: "Ultimate Lithium", chem: "Litio", volt: 1.5, mah: 1250, price: "$$$", desc: "La de mayor duración del mundo." },
+            { id: 4, brand: "Panasonic", model: "Eneloop Pro", chem: "NiMH", volt: 1.2, mah: 930, price: "$$$", desc: "Preferida por profesionales." },
+            { id: 5, brand: "Panasonic", model: "Eneloop Estándar", chem: "NiMH", volt: 1.2, mah: 800, price: "$$$", desc: "2100 ciclos de recarga." },
+            { id: 6, brand: "Duracell", model: "Optimum", chem: "Alcalina", volt: 1.5, mah: 1200, price: "$$$", desc: "Formulación de alta densidad." },
+            { id: 7, brand: "Rayovac", model: "High Energy", chem: "Alcalina", volt: 1.5, mah: 1000, price: "$", desc: "Excelente relación costo/beneficio." },
+            { id: 8, brand: "Amazon Basics", model: "Performance", chem: "Alcalina", volt: 1.5, mah: 1100, price: "$", desc: "Best-seller online." },
+            { id: 9, brand: "Amazon Basics", model: "High-Capacity", chem: "NiMH", volt: 1.2, mah: 850, price: "$$", desc: "Recargable económica." },
+            { id: 10, brand: "Varta", model: "Longlife Power", chem: "Alcalina", volt: 1.5, mah: 1150, price: "$$", desc: "Calidad alemana premium." },
+            { id: 11, brand: "GP Batteries", model: "Ultra", chem: "Alcalina", volt: 1.5, mah: 1100, price: "$", desc: "Marca líder en Asia." },
+            { id: 12, brand: "Energizer", model: "Recharge", chem: "NiMH", volt: 1.2, mah: 800, price: "$$", desc: "Hecha con materiales reciclados." },
+            { id: 13, brand: "Duracell", model: "Rechargeable", chem: "NiMH", volt: 1.2, mah: 900, price: "$$$", desc: "Pre-cargada y lista para usar." },
+            { id: 14, brand: "Panasonic", model: "Evolta", chem: "Alcalina", volt: 1.5, mah: 1200, price: "$$$", desc: "Máximo rendimiento alcalino." },
+            { id: 15, brand: "Rayovac", model: "Heavy Duty", chem: "Zinc", volt: 1.5, mah: 400, price: "$", desc: "Económica solo para relojes." }
+        ];
+
+        const state = { currentTab: 'dashboard', charts: {} };
+        const apiKey = "";
+
+        // Gemini Logic
+        async function askGemini() {
+            const input = document.getElementById('ai-input').value;
+            if (!input.trim()) return;
+
+            const submitBtn = document.getElementById('ai-submit');
+            const resultArea = document.getElementById('ai-result');
+            const responseContainer = document.getElementById('ai-response-container');
+            const loading = document.getElementById('ai-loading');
+
+            submitBtn.disabled = true;
+            responseContainer.classList.remove('hidden');
+            loading.classList.remove('hidden');
+            resultArea.classList.add('hidden');
+            resultArea.innerHTML = "";
+
+            const systemPrompt = `Eres un experto en energía portátil. Tienes acceso a esta lista de las 15 pilas AAA más vendidas: ${JSON.stringify(batteryData)}.
+            El usuario te preguntará por un dispositivo. Analiza su requerimiento y:
+            1. Recomienda las 2 mejores pilas de la lista.
+            2. Explica brevemente por qué esa química es la mejor para su caso (ej. Litio para frío, NiMH para cámaras).
+            3. Sé conciso y usa un tono profesional pero amable.
+            4. Si el dispositivo es de muy bajo consumo, menciona que use alcalinas baratas.
+            5. Si es de alto consumo, prioriza recargables o litio.
+            Usa formato Markdown para el texto (negritas, listas).`;
+
+            let retries = 0;
+            const maxRetries = 5;
+            
+            async function callApi() {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: input }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error('API Error');
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (error) {
+                    if (retries < maxRetries) {
+                        const delay = Math.pow(2, retries) * 1000;
+                        retries++;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return callApi();
+                    }
+                    throw error;
+                }
+            }
+
+            try {
+                const text = await callApi();
+                loading.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+                resultArea.innerHTML = formatMarkdown(text);
+            } catch (error) {
+                loading.classList.add('hidden');
+                resultArea.classList.remove('hidden');
+                resultArea.innerHTML = "<p class='text-red-500'>Lo siento, hubo un problema al conectar con el asistente. Intenta nuevamente en unos instantes.</p>";
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        function formatMarkdown(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>')
+                .replace(/- (.*?)(<br>|$)/g, '<li class="ml-4">$1</li>');
+        }
+
+        // Standard App Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.className = "px-4 py-2 text-sm rounded-md transition-colors tab-btn text-stone-600 hover:text-stone-900");
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.className = "px-4 py-2 text-sm rounded-md transition-colors tab-btn bg-white shadow-sm text-amber-700 font-semibold";
+            if(tabId === 'dashboard') initCharts();
+        }
+
+        function renderGrid(filter = 'all') {
+            const grid = document.getElementById('battery-grid');
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? batteryData : batteryData.filter(b => b.chem === filter);
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 card-hover transition-all">
+                        <h3 class="font-bold text-stone-800">${item.brand}</h3>
+                        <div class="text-xs text-stone-400 uppercase tracking-widest font-semibold mb-3">${item.model}</div>
+                        <div class="flex justify-between text-sm mb-4">
+                            <span class="px-2 py-1 bg-stone-100 rounded">${item.chem}</span>
+                            <span class="font-bold text-amber-600">${item.price}</span>
+                        </div>
+                        <p class="text-sm text-stone-600">${item.desc}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('chemistryChart');
+            const ctx2 = document.getElementById('capacityChart');
+            
+            if(state.charts.c1) state.charts.c1.destroy();
+            if(state.charts.c2) state.charts.c2.destroy();
+
+            state.charts.c1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Alcalina', 'NiMH', 'Litio', 'Otros'],
+                    datasets: [{ data: [8, 4, 2, 1], backgroundColor: ['#ca6c32', '#4a9e68', '#3b82f6', '#78716c'], borderWidth: 0 }]
+                },
+                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            state.charts.c2 = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Alcalina', 'NiMH', 'Litio', 'Zinc'],
+                    datasets: [{ label: 'mAh Promedio', data: [1150, 880, 1250, 400], backgroundColor: '#ca6c32', borderRadius: 8 }]
+                },
+                options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.className = "filter-btn px-3 py-1 bg-stone-200 text-stone-700 rounded-full text-xs");
+                e.target.className = "filter-btn active px-3 py-1 bg-stone-800 text-white rounded-full text-xs";
+                renderGrid(e.target.dataset.filter);
+            };
+        });
+
+        window.onload = () => { renderGrid(); initCharts(); };
+    </script>
+</body>
+</html>
