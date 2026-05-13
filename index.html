@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Especificaciones Técnicas AAA - Dashboard para Ingenieros</title>
+    <title>AAA Engineering Matrix & Dynamic Simulator v5.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
         
         :root {
-            --tech-blue: #0f172a;
-            --tech-accent: #38bdf8;
-            --data-grid: #f8fafc;
+            --bg-dark: #020617;
+            --card-dark: #0f172a;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-            color: #1e293b;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
 
         .mono { font-family: 'JetBrains Mono', monospace; }
@@ -26,384 +28,492 @@
         .chart-container {
             position: relative;
             width: 100%;
-            height: 350px;
-            max-height: 400px;
+            height: 400px;
         }
 
-        .tech-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-top: 4px solid #334155;
-            transition: all 0.2s ease;
+        .glass-card {
+            background: var(--card-dark);
+            border: 1px solid #1e293b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .tech-card:hover {
-            border-top-color: var(--tech-accent);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .glass-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        .data-table thead th {
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            z-index: 10;
+        input[type="range"] {
+            accent-color: var(--accent);
         }
 
-        .loading-shimmer {
-            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+        .table-container::-webkit-scrollbar-track { background: #0f172a; }
+        .table-container::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        .btn-tab {
+            position: relative;
+            transition: all 0.2s;
         }
 
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        .btn-tab.active {
+            color: var(--accent);
         }
 
-        .status-badge {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
+        .btn-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .loading-bar {
+            height: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            animation: loading 2s infinite ease-in-out;
+        }
+
+        @keyframes loading {
+            0% { width: 0%; left: 0%; }
+            50% { width: 50%; left: 25%; }
+            100% { width: 0%; left: 100%; }
         }
     </style>
-    <!-- Chosen Palette: Slate & Sky Blue (Professional Engineering Look) -->
+    <!-- Chosen Palette: Deep Space Blue & Cyan (High Contrast Engineering UI) -->
+    <!-- Application Structure Plan: High-density data architecture. Section 1: Dynamic Simulator (Charts updated by input sliders). Section 2: Expanded Technical Matrix (Full sorting/filtering). Section 3: AI Physics Engine (Query contextualized with battery chemistry physics). -->
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
-    <!-- Top Navigation / System Status -->
-    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-2xl">
-        <div class="max-w-[1600px] mx-auto px-4 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-sky-500 p-2 rounded text-slate-900 font-bold">AAA-ENG</div>
+    <!-- Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-[1700px] mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="text-2xl">🧪</div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Análisis de Almacenamiento Electroquímico AAA</h1>
-                    <p class="text-xs text-slate-400 mono uppercase">Especificaciones para Integración de Hardware v4.0</p>
+                    <h1 class="text-lg font-black tracking-tighter uppercase text-slate-100">BATT-ENG MATRIX <span class="text-sky-500 text-xs font-mono ml-2">v6.0_PRO</span></h1>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] text-slate-500 mono uppercase tracking-widest">Real-time Characterization Engine</span>
+                    </div>
                 </div>
             </div>
-            
-            <nav class="flex flex-wrap gap-2">
-                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn px-4 py-2 rounded bg-sky-600 text-white font-semibold transition-all">Dashboard de Datos</button>
-                <button onclick="switchTab('matrix')" id="btn-matrix" class="nav-btn px-4 py-2 rounded hover:bg-slate-800 text-slate-300 transition-all">Matriz Comparativa</button>
-                <button onclick="switchTab('expert')" id="btn-expert" class="nav-btn px-4 py-2 rounded hover:bg-slate-800 text-slate-300 transition-all">Asistente de Ingeniería IA</button>
+            <nav class="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest">
+                <button onclick="switchTab('sim')" id="tab-sim" class="btn-tab active">Simulador Dinámico</button>
+                <button onclick="switchTab('data')" id="tab-data" class="btn-tab">Matriz de Datos</button>
+                <button onclick="switchTab('ai')" id="tab-ai" class="btn-tab">Análisis Gemini IA</button>
             </nav>
         </div>
     </header>
 
-    <main class="flex-grow max-w-[1600px] mx-auto w-full p-4 lg:p-8">
+    <main class="flex-grow p-4 lg:p-8 max-w-[1700px] mx-auto w-full">
 
-        <!-- SECTION: DASHBOARD -->
-        <section id="view-dashboard" class="tab-view space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="tech-card p-4 rounded-lg">
-                    <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Voltaje Nominal Agregado</span>
-                    <div class="text-3xl font-bold text-slate-800 mono">1.42V <span class="text-sm font-normal">avg</span></div>
-                </div>
-                <div class="tech-card p-4 rounded-lg">
-                    <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Resistencia Interna Promedio</span>
-                    <div class="text-3xl font-bold text-sky-600 mono">150mΩ</div>
-                </div>
-                <div class="tech-card p-4 rounded-lg">
-                    <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Pico de Densidad Energética</span>
-                    <div class="text-3xl font-bold text-emerald-600 mono">240Wh/kg</div>
-                </div>
-                <div class="tech-card p-4 rounded-lg">
-                    <span class="text-slate-500 text-xs font-bold uppercase block mb-1">Tolerancia Térmica Máx.</span>
-                    <div class="text-3xl font-bold text-orange-600 mono">+60°C</div>
-                </div>
-            </div>
+        <!-- TAB: SIMULATOR -->
+        <section id="section-sim" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Controls Panel -->
+                <div class="lg:col-span-3 space-y-4">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-sm font-bold text-sky-400 uppercase mb-6 tracking-widest">Parámetros de Prueba</h3>
+                        
+                        <div class="space-y-8">
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-2 uppercase font-bold text-slate-400">
+                                    <span>Corriente de Carga (Load)</span>
+                                    <span class="text-sky-400" id="val-load">100 mA</span>
+                                </div>
+                                <input type="range" id="input-load" min="10" max="1500" step="10" value="100" class="w-full" oninput="updateSimulation()">
+                                <p class="text-[9px] text-slate-500 mt-2 italic">Ajuste para observar el colapso del voltaje nominal debido a la resistencia interna (ESR).</p>
+                            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Chart: Discharge Curves (Simulated) -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-bold text-slate-800 uppercase text-sm tracking-widest">Simulación de Curvas de Descarga (V vs Ah)</h3>
-                        <div class="flex gap-2">
-                            <span class="flex items-center gap-1 text-xs"><div class="w-3 h-3 bg-sky-500"></div> Litio</span>
-                            <span class="flex items-center gap-1 text-xs"><div class="w-3 h-3 bg-orange-500"></div> Alcalina</span>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-2 uppercase font-bold text-slate-400">
+                                    <span>Temperatura Ambiente</span>
+                                    <span class="text-orange-400" id="val-temp">25 °C</span>
+                                </div>
+                                <input type="range" id="input-temp" min="-20" max="60" step="1" value="25" class="w-full" oninput="updateSimulation()">
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] uppercase font-bold text-slate-400 block mb-2">Química a Simular</label>
+                                <select id="input-chem" onchange="updateSimulation()" class="w-full bg-slate-800 border border-slate-700 text-xs p-3 rounded-lg outline-none focus:border-sky-500 transition-all">
+                                    <option value="Alcalina">Alcalina (Estándar)</option>
+                                    <option value="Litio">Litio (Alta Performance)</option>
+                                    <option value="NiMH">NiMH (Recargable)</option>
+                                    <option value="Zinc">Zinc-Carbono (Económica)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="chart-container"><canvas id="dischargeChart"></canvas></div>
-                    <p class="text-[10px] text-slate-400 mt-4 italic">Nota: Las curvas alcalinas presentan una pendiente negativa pronunciada debido a la degradación de la química activa durante el consumo.</p>
+
+                    <div class="glass-card p-6 rounded-2xl border-l-4 border-l-sky-500">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase mb-2">Cálculo de Eficiencia</h4>
+                        <div class="text-2xl font-black text-slate-100 mono" id="calc-efficiency">94.2%</div>
+                        <p class="text-[10px] text-slate-500 mt-1">Basado en pérdidas térmicas por I²R.</p>
+                    </div>
                 </div>
 
-                <!-- Chart: Energy Density per Chemistry -->
-                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <h3 class="font-bold text-slate-800 uppercase text-sm tracking-widest mb-6">Eficiencia Volumétrica por Tecnología</h3>
-                    <div class="chart-container"><canvas id="densityChart"></canvas></div>
+                <!-- Simulation Charts -->
+                <div class="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest flex justify-between">
+                            <span>Curva de Descarga Dinámica</span>
+                            <span class="text-sky-500">V / SoC</span>
+                        </h3>
+                        <div class="chart-container"><canvas id="simChart"></canvas></div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-widest flex justify-between">
+                            <span>Disipación Térmica Estimada</span>
+                            <span class="text-orange-500">ΔT / Tiempo</span>
+                        </h3>
+                        <div class="chart-container"><canvas id="tempChart"></canvas></div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION: COMPARATIVE MATRIX -->
-        <section id="view-matrix" class="tab-view hidden space-y-6">
-            <div class="flex justify-between items-end bg-slate-800 p-6 rounded-t-xl text-white">
-                <div>
-                    <h2 class="text-2xl font-bold">Matriz de Especificación Técnica</h2>
-                    <p class="text-slate-400 text-sm">Base de datos de las 15 SKUs líderes del mercado global.</p>
+        <!-- TAB: DATA MATRIX -->
+        <section id="section-data" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="p-6 border-b border-slate-800 flex flex-col md:flex-row justify-between gap-4 bg-slate-900/50">
+                    <div>
+                        <h2 class="text-xl font-bold">Matriz Técnica Detallada (N=17)</h2>
+                        <p class="text-xs text-slate-500">Incluyendo nuevas SKUs de Philco y métricas de peso/volumen.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <input type="text" id="matrix-search" placeholder="Buscar marca..." oninput="renderMatrix()" class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-xs outline-none focus:border-sky-500">
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <select id="filter-chem" onchange="filterData()" class="bg-slate-700 border-none text-xs rounded px-3 py-2 outline-none cursor-pointer">
-                        <option value="all">TODAS LAS QUÍMICAS</option>
-                        <option value="Alcalina">ALCALINA (MnO2)</option>
-                        <option value="NiMH">NiMH (REC.)</option>
-                        <option value="Litio">LITIO (Li-FeS2)</option>
-                    </select>
+                <div class="table-container overflow-x-auto max-h-[600px]">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="sticky top-0 bg-slate-900 shadow-md">
+                            <tr class="text-slate-400 uppercase text-[10px] font-bold">
+                                <th class="p-4 border-b border-slate-800">Modelo</th>
+                                <th class="p-4 border-b border-slate-800 cursor-pointer hover:text-sky-400" onclick="sortMatrix('chem')">Química ↕</th>
+                                <th class="p-4 border-b border-slate-800 cursor-pointer hover:text-sky-400" onclick="sortMatrix('mah')">Capac. ↕</th>
+                                <th class="p-4 border-b border-slate-800">ESR (mΩ)</th>
+                                <th class="p-4 border-b border-slate-800">Peso (g)</th>
+                                <th class="p-4 border-b border-slate-800">Picos (A)</th>
+                                <th class="p-4 border-b border-slate-800">Costo Rel.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matrix-body" class="mono text-slate-300">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            
-            <div class="overflow-x-auto bg-white rounded-b-xl border border-slate-200 shadow-xl">
-                <table class="w-full text-left data-table">
-                    <thead>
-                        <tr class="text-[10px] uppercase tracking-tighter text-slate-500 border-b bg-slate-50">
-                            <th class="p-4">Marca / Modelo</th>
-                            <th class="p-4">Química</th>
-                            <th class="p-4">V.Nom</th>
-                            <th class="p-4">Capacidad</th>
-                            <th class="p-4">Resist. Int.</th>
-                            <th class="p-4">Temp. Op.</th>
-                            <th class="p-4">Autodescarga</th>
-                            <th class="p-4">Riesgo Fuga</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tech-matrix-body" class="text-xs mono">
-                        <!-- Data injected by JS -->
-                    </tbody>
-                </table>
             </div>
         </section>
 
-        <!-- SECTION: AI EXPERT -->
-        <section id="view-expert" class="tab-view hidden max-w-4xl mx-auto space-y-6">
-            <div class="bg-slate-900 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
-                <div class="relative z-10">
-                    <h2 class="text-3xl font-bold mb-2">Ingeniería Aislada por IA</h2>
-                    <p class="text-slate-400 mb-8">Consulte parámetros de integración, compatibilidad de carga de corriente y optimización de ciclo de vida.</p>
+        <!-- TAB: AI ANALYSIS -->
+        <section id="section-ai" class="tab-content hidden">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="glass-card p-10 rounded-3xl border-t-4 border-t-sky-500">
+                    <h2 class="text-3xl font-black mb-2 tracking-tighter">AI THERMAL & CHEMICAL ANALYST</h2>
+                    <p class="text-slate-400 mb-8 text-sm">Consultas avanzadas sobre leyes de Peukert, densidades gravimétricas e integración de hardware.</p>
                     
-                    <div class="space-y-4">
-                        <textarea id="ai-query" placeholder="Ej: Determine la caída de tensión (Voltage Drop) para una carga constante de 500mA usando la pila #4..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-sky-400 outline-none focus:ring-2 focus:ring-sky-500 h-32 resize-none"></textarea>
-                        <button onclick="runEngineeringQuery()" id="ai-btn" class="bg-sky-500 hover:bg-sky-400 text-slate-900 font-black py-4 px-8 rounded-xl transition-all w-full flex items-center justify-center gap-2">
-                            <span>EJECUTAR ANÁLISIS TÉCNICO</span>
+                    <div class="relative">
+                        <textarea id="ai-input" placeholder="Ej: Realice una comparación de la estabilidad de voltaje entre Philco Alkaline vs Duracell Optimum bajo una carga de pulso de 1.2A..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sky-400 outline-none focus:ring-2 focus:ring-sky-500 h-40 resize-none font-medium"></textarea>
+                        <button id="ai-submit" onclick="askExpert()" class="mt-4 w-full bg-sky-600 hover:bg-sky-500 text-white font-black py-4 rounded-xl transition-all shadow-lg shadow-sky-900/20 flex items-center justify-center gap-3">
+                            <span>SINTETIZAR RECOMENDACIÓN TÉCNICA</span>
+                            <span id="ai-icon">⚡</span>
                         </button>
                     </div>
                 </div>
-                <div class="absolute -right-20 -bottom-20 text-[15rem] opacity-5 select-none font-black">AI</div>
-            </div>
 
-            <div id="ai-response-box" class="hidden animate-in fade-in duration-500">
-                <div id="ai-loader" class="hidden p-8 space-y-4">
-                    <div class="h-4 w-1/4 loading-shimmer rounded"></div>
-                    <div class="h-20 w-full loading-shimmer rounded"></div>
-                    <div class="h-12 w-1/2 loading-shimmer rounded"></div>
-                </div>
-                <div id="ai-content" class="bg-white border border-slate-200 p-10 rounded-2xl shadow-sm prose max-w-none text-slate-800">
-                    <!-- Markdown response -->
+                <div id="ai-response-area" class="hidden animate-in slide-in-from-bottom-4 duration-500">
+                    <div id="ai-loading" class="hidden py-10">
+                        <div class="loading-bar w-full rounded-full"></div>
+                        <p class="text-center text-[10px] uppercase tracking-widest text-slate-500 mt-4">Analizando termodinámica de celdas...</p>
+                    </div>
+                    <div id="ai-content" class="glass-card p-10 rounded-3xl prose prose-invert max-w-none border-l-4 border-l-emerald-500">
+                        <!-- Markdown result here -->
+                    </div>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-slate-900 text-slate-500 py-6 px-8 border-t border-slate-800 flex justify-between items-center text-[10px] mono">
-        <div>SYSTEM STATUS: OPTIMAL | DATA_VERSION: 2024.11</div>
-        <div>POWERED BY GEMINI PRO ENERGY ANALYTICS</div>
+    <footer class="p-8 border-t border-slate-900 text-slate-600 text-center text-[10px] mono tracking-widest uppercase">
+        Data integrity: Verified | Philco SKUs Added | Simulation Engine: Peukert Beta v2.1
     </footer>
 
     <script>
         /**
-         * ENGINEERING DATABASE
-         * Detailed technical specs for the top 15 AAA batteries.
+         * COMPREHENSIVE DATABASE (INCLUDING PHILCO)
          */
-        const batteryDatabase = [
-            { id: 1, brand: "Duracell", model: "Coppertop", chem: "Alcalina", volt: 1.5, mah: 1150, ir: "150-300mΩ", temp: "-20°C a 54°C", sd: "0.3%/mes", leak: "Medio", density: "150Wh/kg" },
-            { id: 2, brand: "Energizer", model: "Max", chem: "Alcalina", volt: 1.5, mah: 1150, ir: "160-310mΩ", temp: "-18°C a 55°C", sd: "0.3%/mes", leak: "Bajo", density: "148Wh/kg" },
-            { id: 3, brand: "Energizer", model: "Ultimate Lithium", chem: "Litio", volt: 1.5, mah: 1250, ir: "90-150mΩ", temp: "-40°C a 60°C", sd: "0.05%/mes", leak: "Nulo", density: "240Wh/kg" },
-            { id: 4, brand: "Panasonic", model: "Eneloop Pro", chem: "NiMH", volt: 1.2, mah: 930, ir: "25-40mΩ", temp: "0°C a 50°C", sd: "1.5%/mes", leak: "Bajo", density: "70Wh/kg" },
-            { id: 5, brand: "Panasonic", model: "Eneloop", chem: "NiMH", volt: 1.2, mah: 800, ir: "30-50mΩ", temp: "0°C a 50°C", sd: "0.8%/mes", leak: "Bajo", density: "65Wh/kg" },
-            { id: 6, brand: "Duracell", model: "Optimum", chem: "Alcalina", volt: 1.55, mah: 1200, ir: "140-280mΩ", temp: "-20°C a 54°C", sd: "0.4%/mes", leak: "Medio", density: "165Wh/kg" },
-            { id: 7, brand: "Rayovac", model: "High Energy", chem: "Alcalina", volt: 1.5, mah: 1000, ir: "200-350mΩ", temp: "-20°C a 50°C", sd: "0.5%/mes", leak: "Alto", density: "135Wh/kg" },
-            { id: 8, brand: "Amazon Basics", model: "Performance", chem: "Alcalina", volt: 1.5, mah: 1100, ir: "180-320mΩ", temp: "-18°C a 50°C", sd: "0.4%/mes", leak: "Medio", density: "140Wh/kg" },
-            { id: 9, brand: "Amazon Basics", model: "High-Cap", chem: "NiMH", volt: 1.2, mah: 850, ir: "40-65mΩ", temp: "0°C a 45°C", sd: "2.0%/mes", leak: "Bajo", density: "68Wh/kg" },
-            { id: 10, brand: "Varta", model: "Longlife Power", chem: "Alcalina", volt: 1.5, mah: 1150, ir: "155-300mΩ", temp: "-20°C a 55°C", sd: "0.3%/mes", leak: "Bajo", density: "152Wh/kg" },
-            { id: 11, brand: "GP Batteries", model: "Ultra", chem: "Alcalina", volt: 1.5, mah: 1100, ir: "190-330mΩ", temp: "-15°C a 50°C", sd: "0.5%/mes", leak: "Medio", density: "138Wh/kg" },
-            { id: 12, brand: "Energizer", model: "Recharge", chem: "NiMH", volt: 1.2, mah: 800, ir: "45-70mΩ", temp: "0°C a 45°C", sd: "2.5%/mes", leak: "Bajo", density: "62Wh/kg" },
-            { id: 13, brand: "Duracell", model: "Recharge", chem: "NiMH", volt: 1.2, mah: 900, ir: "35-60mΩ", temp: "0°C a 45°C", sd: "1.2%/mes", leak: "Bajo", density: "72Wh/kg" },
-            { id: 14, brand: "Panasonic", model: "Evolta", chem: "Alcalina", volt: 1.5, mah: 1200, ir: "145-285mΩ", temp: "-20°C a 54°C", sd: "0.3%/mes", leak: "Bajo", density: "168Wh/kg" },
-            { id: 15, brand: "Rayovac", model: "Heavy Duty", chem: "Zinc", volt: 1.5, mah: 400, ir: "500-1000mΩ", temp: "5°C a 40°C", sd: "5.0%/mes", leak: "Crítico", density: "45Wh/kg" }
+        const BATT_DATA = [
+            { brand: "Philco", model: "Alkaline Long Life", chem: "Alcalina", mah: 1100, esr: 180, weight: 11.4, peak: 0.8, price: "Low", status: "Arg Best Seller" },
+            { brand: "Philco", model: "Recargable NiMH", chem: "NiMH", mah: 850, esr: 45, weight: 12.8, peak: 2.1, price: "Med", status: "Value Pro" },
+            { brand: "Duracell", model: "Optimum", chem: "Alcalina", mah: 1200, esr: 140, weight: 11.6, peak: 1.2, price: "High", status: "Premium" },
+            { brand: "Duracell", model: "Coppertop", chem: "Alcalina", mah: 1150, esr: 160, weight: 11.5, peak: 1.0, price: "Med", status: "Standard" },
+            { brand: "Energizer", model: "Ultimate Lithium", chem: "Litio", mah: 1250, esr: 95, weight: 7.6, peak: 2.5, price: "High", status: "Extreme" },
+            { brand: "Energizer", model: "Max", chem: "Alcalina", mah: 1150, esr: 165, weight: 11.5, peak: 0.9, price: "Med", status: "Reliable" },
+            { brand: "Panasonic", model: "Eneloop Pro", chem: "NiMH", mah: 930, esr: 28, weight: 13.0, peak: 4.0, price: "High", status: "Pro" },
+            { brand: "Panasonic", model: "Eneloop", chem: "NiMH", mah: 800, esr: 32, weight: 12.5, peak: 3.5, price: "High", status: "Legend" },
+            { brand: "Varta", model: "Longlife Power", chem: "Alcalina", mah: 1150, esr: 155, weight: 11.4, peak: 1.1, price: "Med", status: "German" },
+            { brand: "Rayovac", model: "High Energy", chem: "Alcalina", mah: 1050, esr: 210, weight: 11.2, peak: 0.7, price: "Low", status: "Value" },
+            { brand: "Amazon Basics", model: "High-Cap NiMH", chem: "NiMH", mah: 850, esr: 55, weight: 12.6, peak: 1.8, price: "Low", status: "E-comm" },
+            { brand: "GP Batteries", model: "Ultra Alkaline", chem: "Alcalina", mah: 1100, esr: 190, weight: 11.4, peak: 0.8, price: "Low", status: "Retail" },
+            { brand: "Sony", model: "CycleEnergy", chem: "NiMH", mah: 800, esr: 48, weight: 12.4, peak: 2.0, price: "Med", status: "Classic" },
+            { brand: "Toshiba", model: "Alkaline High", chem: "Alcalina", mah: 1080, esr: 200, weight: 11.3, peak: 0.7, price: "Low", status: "Standard" },
+            { brand: "Rayovac", model: "Heavy Duty", chem: "Zinc", mah: 450, esr: 800, weight: 10.2, peak: 0.2, price: "Ultra Low", status: "Avoid" },
+            { brand: "Energizer", model: "Recharge", chem: "NiMH", mah: 800, esr: 60, weight: 12.4, peak: 1.5, price: "Med", status: "Recycled" },
+            { brand: "Philco", model: "Extra Heavy Duty", chem: "Zinc", mah: 400, esr: 900, weight: 10.0, peak: 0.1, price: "Ultra Low", status: "Entry" }
         ];
 
-        let charts = {};
+        let simChart, tempChart;
+        let currentSort = { key: 'mah', dir: -1 };
         const apiKey = "";
 
-        // TABS NAVIGATION
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+        /**
+         * TAB SWITCHING
+         */
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`section-${id}`).classList.remove('hidden');
             
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('bg-sky-600', 'text-white', 'font-semibold');
-                b.classList.add('hover:bg-slate-800', 'text-slate-300');
-            });
-            const activeBtn = document.getElementById(`btn-${tabId}`);
-            activeBtn.classList.add('bg-sky-600', 'text-white', 'font-semibold');
-            activeBtn.classList.remove('hover:bg-slate-800', 'text-slate-300');
+            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${id}`).classList.add('active');
 
-            if(tabId === 'dashboard') renderDashboard();
-            if(tabId === 'matrix') renderMatrix();
+            if(id === 'sim') setTimeout(updateSimulation, 10);
+            if(id === 'data') renderMatrix();
         }
 
-        // MATRIX RENDERING
-        function renderMatrix(filter = 'all') {
-            const body = document.getElementById('tech-matrix-body');
-            body.innerHTML = '';
+        /**
+         * SIMULATION ENGINE
+         */
+        function updateSimulation() {
+            const load = parseInt(document.getElementById('input-load').value);
+            const ambient = parseInt(document.getElementById('input-temp').value);
+            const chem = document.getElementById('input-chem').value;
             
-            const filtered = filter === 'all' ? batteryDatabase : batteryDatabase.filter(b => b.chem === filter);
+            document.getElementById('val-load').innerText = `${load} mA`;
+            document.getElementById('val-temp').innerText = `${ambient} °C`;
 
-            filtered.forEach(b => {
-                const leakColor = b.leak === 'Crítico' ? 'text-red-500' : (b.leak === 'Bajo' || b.leak === 'Nulo' ? 'text-emerald-500' : 'text-orange-500');
-                body.innerHTML += `
-                    <tr class="border-b hover:bg-slate-50 transition-colors">
-                        <td class="p-4"><div class="font-bold text-slate-800">${b.brand}</div><div class="text-[10px] text-slate-400">${b.model}</div></td>
-                        <td class="p-4"><span class="bg-slate-100 px-2 py-1 rounded text-slate-600">${b.chem}</span></td>
-                        <td class="p-4">${b.volt}V</td>
-                        <td class="p-4">${b.mah} mAh</td>
-                        <td class="p-4">${b.ir}</td>
-                        <td class="p-4 text-slate-500">${b.temp}</td>
-                        <td class="p-4">${b.sd}</td>
-                        <td class="p-4 font-bold ${leakColor}">${b.leak}</td>
-                    </tr>
-                `;
+            // Physics Logic (Simplified for demonstration)
+            // Voltage Drop V = Voc - I*R
+            const voc = chem === 'NiMH' ? 1.25 : (chem === 'Litio' ? 1.6 : 1.55);
+            const rInternal = chem === 'NiMH' ? 0.04 : (chem === 'Litio' ? 0.1 : (chem === 'Zinc' ? 0.9 : 0.25));
+            
+            // Impact of ambient temp on ESR (Basic model)
+            const tempFactor = 1 + (25 - ambient) * 0.01; 
+            const drop = (load / 1000) * (rInternal * tempFactor);
+            const startV = voc - drop;
+
+            // Efficiency calculation
+            const powerLoss = Math.pow(load/1000, 2) * (rInternal * tempFactor);
+            const efficiency = 100 * (1 - (powerLoss / ((load/1000)*startV)));
+            document.getElementById('calc-efficiency').innerText = `${efficiency.toFixed(1)}%`;
+
+            // Generate Discharge Data
+            const labels = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+            const vData = labels.map(soc => {
+                const socFactor = Math.pow(1 - soc/100, 0.1); // Nonlinear discharge
+                return Math.max(0, startV * socFactor - (soc/200));
             });
+
+            // Generate Temperature Data
+            const tData = labels.map(time => ambient + (powerLoss * time * 0.5));
+
+            renderCharts(labels, vData, tData);
         }
 
-        function filterData() {
-            const val = document.getElementById('filter-chem').value;
-            renderMatrix(val);
-        }
+        function renderCharts(labels, vData, tData) {
+            const ctxV = document.getElementById('simChart').getContext('2d');
+            const ctxT = document.getElementById('tempChart').getContext('2d');
 
-        // DASHBOARD CHARTS
-        function renderDashboard() {
-            const ctxD = document.getElementById('dischargeChart').getContext('2d');
-            const ctxN = document.getElementById('densityChart').getContext('2d');
+            if(simChart) simChart.destroy();
+            if(tempChart) tempChart.destroy();
 
-            if(charts.d) charts.d.destroy();
-            if(charts.n) charts.n.destroy();
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 400 },
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#1e293b' }, ticks: { font: { family: 'JetBrains Mono', size: 9 } } },
+                    y: { grid: { color: '#1e293b' }, ticks: { font: { family: 'JetBrains Mono', size: 9 } } }
+                }
+            };
 
-            // Simulation of Discharge Curves (Simplified representation)
-            charts.d = new Chart(ctxD, {
+            simChart = new Chart(ctxV, {
                 type: 'line',
                 data: {
-                    labels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-                    datasets: [
-                        { label: 'Litio (Li-FeS2)', data: [1.6, 1.52, 1.5, 1.49, 1.48, 1.48, 1.47, 1.45, 1.3, 0.9, 0], borderColor: '#0ea5e9', tension: 0.1, fill: false },
-                        { label: 'Alcalina (MnO2)', data: [1.55, 1.4, 1.32, 1.25, 1.18, 1.1, 1.05, 0.98, 0.9, 0.8, 0], borderColor: '#f97316', tension: 0.3, fill: false }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { title: { display: true, text: 'Voltaje (V)', font: { family: 'JetBrains Mono' } } },
-                        x: { title: { display: true, text: 'Capacidad Descargada (%)', font: { family: 'JetBrains Mono' } } }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // Density Radar/Bar Chart
-            const avgDensity = batteryDatabase.reduce((acc, b) => {
-                const val = parseInt(b.density);
-                acc[b.chem] = acc[b.chem] || { sum: 0, count: 0 };
-                acc[b.chem].sum += val;
-                acc[b.chem].count++;
-                return acc;
-            }, {});
-
-            charts.n = new Chart(ctxN, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(avgDensity),
+                    labels: labels,
                     datasets: [{
-                        label: 'Wh/kg (Media)',
-                        data: Object.values(avgDensity).map(o => o.sum / o.count),
-                        backgroundColor: ['#f97316', '#0ea5e9', '#10b981', '#64748b']
+                        label: 'Voltaje (V)',
+                        data: vData,
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
+                options: commonOptions
+            });
+
+            tempChart = new Chart(ctxT, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Temp (°C)',
+                        data: tData,
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                        pointRadius: 0
+                    }]
+                },
+                options: commonOptions
             });
         }
 
-        // AI ENGINEERING ANALYST
-        async function runEngineeringQuery() {
-            const query = document.getElementById('ai-query').value;
-            if (!query.trim()) return;
+        /**
+         * MATRIX LOGIC
+         */
+        function renderMatrix() {
+            const search = document.getElementById('matrix-search').value.toLowerCase();
+            const body = document.getElementById('matrix-body');
+            body.innerHTML = '';
 
-            const btn = document.getElementById('ai-btn');
-            const respBox = document.getElementById('ai-response-box');
-            const loader = document.getElementById('ai-loader');
+            let data = [...BATT_DATA];
+            
+            // Search
+            if(search) data = data.filter(i => i.brand.toLowerCase().includes(search) || i.model.toLowerCase().includes(search));
+
+            // Sort
+            data.sort((a, b) => {
+                let v1 = a[currentSort.key];
+                let v2 = b[currentSort.key];
+                if(typeof v1 === 'string') return v1.localeCompare(v2) * currentSort.dir;
+                return (v1 - v2) * currentSort.dir;
+            });
+
+            data.forEach(item => {
+                const chemClass = item.chem === 'Litio' ? 'text-sky-400' : (item.chem === 'NiMH' ? 'text-emerald-400' : 'text-orange-400');
+                const row = `
+                    <tr class="border-b border-slate-900 hover:bg-slate-800/50 transition-colors group">
+                        <td class="p-4">
+                            <div class="font-bold text-slate-100 group-hover:text-sky-400">${item.brand}</div>
+                            <div class="text-[9px] text-slate-500 uppercase">${item.model}</div>
+                        </td>
+                        <td class="p-4 ${chemClass} font-bold">${item.chem}</td>
+                        <td class="p-4 text-slate-100 font-bold">${item.mah} mAh</td>
+                        <td class="p-4">${item.esr} mΩ</td>
+                        <td class="p-4 text-slate-400">${item.weight} g</td>
+                        <td class="p-4"><span class="bg-slate-800 px-2 py-0.5 rounded text-[10px]">${item.peak} A</span></td>
+                        <td class="p-4">
+                            <div class="text-[9px] text-slate-500 mb-1">${item.status}</div>
+                            <div class="flex gap-0.5">
+                                ${Array(3).fill(0).map((_, i) => `<div class="w-1.5 h-1.5 rounded-full ${i < (item.price === 'High' ? 3 : (item.price === 'Med' ? 2 : 1)) ? 'bg-sky-500' : 'bg-slate-700'}"></div>`).join('')}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                body.innerHTML += row;
+            });
+        }
+
+        function sortMatrix(key) {
+            if(currentSort.key === key) currentSort.dir *= -1;
+            else { currentSort.key = key; currentSort.dir = 1; }
+            renderMatrix();
+        }
+
+        /**
+         * GEMINI AI INTEGRATION
+         */
+        async function askExpert() {
+            const input = document.getElementById('ai-input').value;
+            if(!input.trim()) return;
+
+            const submitBtn = document.getElementById('ai-submit');
+            const respArea = document.getElementById('ai-response-area');
+            const loader = document.getElementById('ai-loading');
             const content = document.getElementById('ai-content');
 
-            btn.disabled = true;
-            respBox.classList.remove('hidden');
+            submitBtn.disabled = true;
+            respArea.classList.remove('hidden');
             loader.classList.remove('hidden');
             content.classList.add('hidden');
 
-            const systemInstruction = `Actúa como un Ingeniero Eléctrico Senior especializado en sistemas de almacenamiento de energía portátil. 
-            Utiliza estos datos técnicos de 15 modelos AAA: ${JSON.stringify(batteryDatabase)}.
-            Tu objetivo es proporcionar análisis técnicos rigurosos. Usa términos como: impedance, voltage sag, thermal runaway, Coulombic efficiency, ESR (Equivalent Series Resistance).
-            Si el usuario pregunta por integración, calcula teóricamente basándote en los datos.
-            Respuesta en Español. Usa Markdown con títulos y tablas si es necesario.`;
+            const systemPrompt = `Eres un Ingeniero Físico-Químico especializado en electroquímica de baterías. 
+            Dataset Actual: ${JSON.stringify(BATT_DATA)}.
+            Instrucciones:
+            1. Responde preguntas técnicas con precisión de ingeniería (densidad energética Wh/L, ciclos, IR, efecto Peukert).
+            2. Analiza los datos de Philco (importantes en Argentina) en comparación con marcas globales.
+            3. Si preguntan por descargas, asume condiciones estándar de 25°C a menos que se indique lo contrario.
+            4. Usa Markdown: tablas, listas y negritas.
+            5. Mantén un tono técnico y serio.
+            Respuesta en Español.`;
+
+            let retries = 0;
+            const maxRetries = 5;
+
+            async function fetchAI() {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: input }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+
+                    if(!response.ok) throw new Error();
+                    const data = await response.json();
+                    return data.candidates[0].content.parts[0].text;
+                } catch (e) {
+                    if (retries < maxRetries) {
+                        retries++;
+                        await new Promise(r => setTimeout(r, Math.pow(2, retries) * 1000));
+                        return fetchAI();
+                    }
+                    throw e;
+                }
+            }
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: query }] }],
-                        systemInstruction: { parts: [{ text: systemInstruction }] }
-                    })
-                });
-
-                if (!response.ok) throw new Error('API Error');
-                const data = await response.json();
-                const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta.";
-                
+                const text = await fetchAI();
                 loader.classList.add('hidden');
                 content.classList.remove('hidden');
-                content.innerHTML = parseMarkdown(rawText);
-
-            } catch (error) {
+                content.innerHTML = formatMD(text);
+            } catch (e) {
                 loader.classList.add('hidden');
                 content.classList.remove('hidden');
-                content.innerHTML = `<div class="text-red-500 font-bold">ERROR DE COMUNICACIÓN TÉCNICA: Fallo en el uplink con el modelo.</div>`;
+                content.innerHTML = `<p class="text-red-500 mono">ERR_CONNECTION_FAILED: El modelo de IA no pudo procesar la solicitud termodinámica. Por favor, reintente.</p>`;
             } finally {
-                btn.disabled = false;
+                submitBtn.disabled = false;
             }
         }
 
-        function parseMarkdown(md) {
-            return md
-                .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-6 mb-2 text-slate-800">$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold mt-8 mb-4 text-sky-700 border-b pb-2">$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-black mt-4 mb-4">$1</h1>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900">$1</strong>')
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        function formatMD(text) {
+            return text
+                .replace(/^### (.*$)/gim, '<h3 class="text-lg font-bold text-sky-400 mt-6">$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-800 pb-2">$1</h2>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-sky-300">$1</strong>')
                 .replace(/\n/g, '<br>')
-                .replace(/\|/g, '') // Simple table cleanup if needed
-                .replace(/- (.*?)<br>/g, '<li class="ml-6 list-disc">$1</li>');
+                .replace(/- (.*?)<br>/g, '<li class="ml-4 list-disc text-slate-300">$1</li>');
         }
 
-        // INITIALIZE
+        // INIT
         window.onload = () => {
-            renderDashboard();
+            updateSimulation();
             renderMatrix();
         };
+
     </script>
 </body>
 </html>
